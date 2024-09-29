@@ -7,7 +7,7 @@ const instanceSupabase = supabase.createClient(supabaseUrl, supabaseKey);
 // Elements
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
-const mainContent = document.getElementById('main-content');
+const mainContent = document.getElementById('banner');
 
 // Check Auth State
 instanceSupabase.auth.onAuthStateChange((event, session) => {
@@ -37,12 +37,12 @@ logoutBtn.addEventListener('click', () => {
 // Load Content Based on User
 function loadContent(user) {
     const adminEmails = ['zoyasalman497@gmail.com', 'salmanaziz497@gmail.com'];
-    // if (adminEmails.includes(user.email)) {
-    //     loadAdminContent();
-    //     loadFriendContent();
-    // } else {
-    //     loadFriendContent();
-    // }
+    if (adminEmails.includes(user.email)) {
+        loadAdminContent();
+        loadFriendContent();
+    } else {
+        loadFriendContent();
+    }
 }
 
 // Admin Content
@@ -60,15 +60,27 @@ function loadAdminContent() {
 // Friend Content
 function loadFriendContent() {
     mainContent.innerHTML = `
-        <h1>Welcome, Friend!</h1>
-        <div id="game-section">
-            <h2>Let's Play Tic-Tac-Toe!</h2>
-            <div class="game-board" id="game-board"></div>
-            <button class="btn btn-secondary" id="reset-game-btn">Reset Game</button>
-        </div>
-        <div id="blogs-section"></div>
+       <div class="content"> 
+        <header>
+            <h2>Welcome, Friend!</h2>
+            <div id="game-section">
+                <h2>Let's Play Tic-Tac-Toe!</h2>
+                <div class="game-board" id="game-board"></div>
+                <button class="btn btn-secondary" id="reset-game-btn">Reset Game</button>
+            </div>
+        </header>
+       </div>
     `;
 
+
+    // <div class="content">
+	// 					<header>
+	// 						<h2>Welcome to Zoya's World</h2>
+	// 						<p>I'm a 10-year-old who loves art, Roblox, and music by Alan Walker!<br />
+	// 						Join me in exploring my world of creativity and fun!</p>
+	// 					</header>
+	// 					<span class="image"><img src="images/zoyapic.jpeg" alt="Zoya's World" /></span>
+	// 				</div>
     initGame();
     loadBlogs(false);
 }
