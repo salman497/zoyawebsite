@@ -1,7 +1,14 @@
 // Initialize Supabase
-const supabaseUrl = 'https://wwcfdhwkgsjvxqanogek.supabase.co';
+let instance;
+function supaBaseInstance() { 
+    if(instance) {
+        return instance;
+    }
+    const supabaseUrl = 'https://wwcfdhwkgsjvxqanogek.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2ZkaHdrZ3NqdnhxYW5vZ2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc1ODg2MTIsImV4cCI6MjA0MzE2NDYxMn0.scgCd02DWyfGT551Czaa1dlAnDDubJr173MQ_ORFVi4';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+instance = supabase.createClient(supabaseUrl, supabaseKey);
+return instance;
+}
 
 // Elements
 const loginBtn = document.getElementById('login-btn');
@@ -9,7 +16,7 @@ const logoutBtn = document.getElementById('logout-btn');
 const mainContent = document.getElementById('main-content');
 
 // Check Auth State
-supabase.auth.onAuthStateChange((event, session) => {
+supaBaseInstance().auth.onAuthStateChange((event, session) => {
     if (session && session.user) {
         loginBtn.classList.add('d-none');
         logoutBtn.classList.remove('d-none');
@@ -23,14 +30,14 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 // Login Function
 loginBtn.addEventListener('click', () => {
-    supabase.auth.signInWithOAuth({
+    supaBaseInstance().auth.signInWithOAuth({
         provider: 'google',
     });
 });
 
 // Logout Function
 logoutBtn.addEventListener('click', () => {
-    supabase.auth.signOut();
+    supaBaseInstance().auth.signOut();
 });
 
 // Load Content Based on User
@@ -131,7 +138,7 @@ function initGame() {
 
 // Load Blogs
 async function loadBlogs(isAdmin) {
-    let { data: blogs, error } = await supabase.from('blogs').select('*');
+    let { data: blogs, error } = await supaBaseInstance().from('blogs').select('*');
     if (error) {
         console.error(error);
         return;
@@ -166,7 +173,7 @@ async function loadBlogs(isAdmin) {
 
 // Load Comments
 async function loadComments(blogId) {
-    let { data: comments, error } = await supabase
+    let { data: comments, error } = await supaBaseInstance()
         .from('comments')
         .select('content, created_at')
         .eq('blog_id', blogId);
@@ -185,9 +192,9 @@ async function loadComments(blogId) {
 
 // Submit Comment
 async function submitComment(blogId, content) {
-    const user = supabase.auth.user();
+    const user = supaBaseInstance().auth.user();
     if (!user) return;
-    const { error } = await supabase.from('comments').insert([{ blog_id: blogId, user_id: user.id, content }]);
+    const { error } = await supaBaseInstance().from('comments').insert([{ blog_id: blogId, user_id: user.id, content }]);
     if (error) {
         console.error(error);
         return;
@@ -219,7 +226,7 @@ function showBlogEditor() {
 async function saveBlog(quill) {
     const title = document.getElementById('blog-title').value;
     const content = quill.root.innerHTML;
-    const { error } = await supabase.from('blogs').insert([{ title, content }]);
+    const { error } = await supaBaseInstance().from('blogs').insert([{ title, content }]);
     if (error) {
         console.error(error);
         return;
@@ -230,7 +237,7 @@ async function saveBlog(quill) {
 
 // Delete Blog
 async function deleteBlog(id) {
-    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    const { error } = await supaBaseInstance().from('blogs').delete().eq('id', id);
     if (error) {
         console.error(error);
         return;
