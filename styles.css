@@ -1,0 +1,44 @@
+body {
+    background-color: #ffe6f2; /* Light pink background */
+    color: #000;
+}
+
+.navbar {
+    background-color: #000; /* Black navbar */
+}
+
+.navbar-brand {
+    color: #ff66cc !important; /* Pink text */
+}
+
+.btn-outline-light {
+    border-color: #ff66cc;
+    color: #ff66cc;
+}
+
+.btn-outline-light:hover {
+    background-color: #ff66cc;
+    color: #fff;
+}
+
+#main-content h1 {
+    color: #ff66cc;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 5px;
+    justify-content: center;
+}
+
+.game-cell {
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    font-size: 2rem;
+    text-align: center;
+    line-height: 100px;
+    cursor: pointer;
+    border: 2px solid #ff66cc;
+}
