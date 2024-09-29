@@ -138,24 +138,61 @@ async function loadBlogs(isAdmin) {
     }
     const blogsSection = document.getElementById('blogs-section');
     blogsSection.innerHTML = '<h2>Blogs</h2>';
-    blogs.forEach(blog => {
+    for (let blog of blogs) {
         const blogDiv = document.createElement('div');
         blogDiv.classList.add('card', 'mb-3');
         blogDiv.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">${blog.title}</h5>
-                <p class="card-text">${blog.content}</p>
+                <div class="card-text">${blog.content}</div>
+                <div id="comments-${blog.id}"></div>
             </div>
         `;
-        if (isAdmin) {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.classList.add('btn', 'btn-danger');
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.addEventListener('click', () => deleteBlog(blog.id));
-            blogDiv.querySelector('.card-body').appendChild(deleteBtn);
+        if (!isAdmin) {
+            const commentBox = document.createElement('textarea');
+            commentBox.classList.add('form-control', 'mt-2');
+            commentBox.placeholder = 'Add a comment...';
+            const submitBtn = document.createElement('button');
+            submitBtn.classList.add('btn', 'btn-primary', 'mt-2');
+            submitBtn.textContent = 'Submit';
+            submitBtn.addEventListener('click', () => submitComment(blog.id, commentBox.value));
+            blogDiv.querySelector('.card-body').appendChild(commentBox);
+            blogDiv.querySelector('.card-body').appendChild(submitBtn);
         }
         blogsSection.appendChild(blogDiv);
+        loadComments(blog.id);
+    }
+}
+
+// Load Comments
+async function loadComments(blogId) {
+    let { data: comments, error } = await supabase
+        .from('comments')
+        .select('content, created_at')
+        .eq('blog_id', blogId);
+    if (error) {
+        console.error(error);
+        return;
+    }
+    const commentsDiv = document.getElementById(`comments-${blogId}`);
+    commentsDiv.innerHTML = '<h6>Comments:</h6>';
+    comments.forEach(comment => {
+        const commentP = document.createElement('p');
+        commentP.textContent = `${comment.content} - ${new Date(comment.created_at).toLocaleString()}`;
+        commentsDiv.appendChild(commentP);
     });
+}
+
+// Submit Comment
+async function submitComment(blogId, content) {
+    const user = supabase.auth.user();
+    if (!user) return;
+    const { error } = await supabase.from('comments').insert([{ blog_id: blogId, user_id: user.id, content }]);
+    if (error) {
+        console.error(error);
+        return;
+    }
+    loadComments(blogId);
 }
 
 // Show Blog Editor
@@ -164,17 +201,24 @@ function showBlogEditor() {
         <div id="blog-editor">
             <h2>Add New Blog</h2>
             <input type="text" id="blog-title" class="form-control" placeholder="Blog Title">
-            <textarea id="blog-content" class="form-control mt-2" placeholder="Blog Content"></textarea>
+            <div id="editor" class="form-control mt-2" style="height: 200px;"></div>
             <button class="btn btn-success mt-2" id="save-blog-btn">Save Blog</button>
         </div>
+        <!-- Quill JS -->
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     `;
-    document.getElementById('save-blog-btn').addEventListener('click', saveBlog);
+
+    const quill = new Quill('#editor', {
+        theme: 'snow'
+    });
+
+    document.getElementById('save-blog-btn').addEventListener('click', () => saveBlog(quill));
 }
 
 // Save Blog
-async function saveBlog() {
+async function saveBlog(quill) {
     const title = document.getElementById('blog-title').value;
-    const content = document.getElementById('blog-content').value;
+    const content = quill.root.innerHTML;
     const { error } = await supabase.from('blogs').insert([{ title, content }]);
     if (error) {
         console.error(error);
