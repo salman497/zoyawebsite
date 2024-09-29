@@ -48,6 +48,7 @@ function loadContent(user) {
     const adminEmails = ['zoyasalman497@gmail.com', 'salmanaziz497@gmail.com'];
     if (adminEmails.includes(user.email)) {
         loadAdminContent();
+        loadFriendContent();
     } else {
         loadFriendContent();
     }
