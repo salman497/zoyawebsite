@@ -32,9 +32,6 @@ supaBaseInstance().auth.onAuthStateChange((event, session) => {
 loginBtn.addEventListener('click', () => {
     supaBaseInstance().auth.signInWithOAuth({
         provider: 'google',
-        options: {
-            redirectTo: window.location.origin // Redirect back to the homepage after login
-          }
     });
 });
 
