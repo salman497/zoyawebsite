@@ -1,14 +1,8 @@
 // Initialize Supabase
-let instance;
-function supaBaseInstance() { 
-    if(instance) {
-        return instance;
-    }
-    const supabaseUrl = 'https://wwcfdhwkgsjvxqanogek.supabase.co';
+
+const supabaseUrl = 'https://wwcfdhwkgsjvxqanogek.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Y2ZkaHdrZ3NqdnhxYW5vZ2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc1ODg2MTIsImV4cCI6MjA0MzE2NDYxMn0.scgCd02DWyfGT551Czaa1dlAnDDubJr173MQ_ORFVi4';
-instance = supabase.createClient(supabaseUrl, supabaseKey);
-return instance;
-}
+const instanceSupabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // Elements
 const loginBtn = document.getElementById('login-btn');
@@ -16,7 +10,7 @@ const logoutBtn = document.getElementById('logout-btn');
 const mainContent = document.getElementById('main-content');
 
 // Check Auth State
-supaBaseInstance().auth.onAuthStateChange((event, session) => {
+instanceSupabase.auth.onAuthStateChange((event, session) => {
     if (session && session.user) {
         loginBtn.classList.add('d-none');
         logoutBtn.classList.remove('d-none');
@@ -24,31 +18,31 @@ supaBaseInstance().auth.onAuthStateChange((event, session) => {
     } else {
         loginBtn.classList.remove('d-none');
         logoutBtn.classList.add('d-none');
-        mainContent.innerHTML = '<h1>Welcome to Zoya\'s World</h1>';
+        //mainContent.innerHTML = '<h1>Welcome to Zoya\'s World</h1>';
     }
 });
 
 // Login Function
 loginBtn.addEventListener('click', () => {
-    supaBaseInstance().auth.signInWithOAuth({
+    instanceSupabase.auth.signInWithOAuth({
         provider: 'google',
     });
 });
 
 // Logout Function
 logoutBtn.addEventListener('click', () => {
-    supaBaseInstance().auth.signOut();
+    instanceSupabase.auth.signOut();
 });
 
 // Load Content Based on User
 function loadContent(user) {
     const adminEmails = ['zoyasalman497@gmail.com', 'salmanaziz497@gmail.com'];
-    if (adminEmails.includes(user.email)) {
-        loadAdminContent();
-        loadFriendContent();
-    } else {
-        loadFriendContent();
-    }
+    // if (adminEmails.includes(user.email)) {
+    //     loadAdminContent();
+    //     loadFriendContent();
+    // } else {
+    //     loadFriendContent();
+    // }
 }
 
 // Admin Content
@@ -139,7 +133,7 @@ function initGame() {
 
 // Load Blogs
 async function loadBlogs(isAdmin) {
-    let { data: blogs, error } = await supaBaseInstance().from('blogs').select('*');
+    let { data: blogs, error } = await instanceSupabase.from('blogs').select('*');
     if (error) {
         console.error(error);
         return;
@@ -174,7 +168,7 @@ async function loadBlogs(isAdmin) {
 
 // Load Comments
 async function loadComments(blogId) {
-    let { data: comments, error } = await supaBaseInstance()
+    let { data: comments, error } = await instanceSupabase
         .from('comments')
         .select('content, created_at')
         .eq('blog_id', blogId);
@@ -193,9 +187,9 @@ async function loadComments(blogId) {
 
 // Submit Comment
 async function submitComment(blogId, content) {
-    const user = supaBaseInstance().auth.user();
+    const user = instanceSupabase.auth.user();
     if (!user) return;
-    const { error } = await supaBaseInstance().from('comments').insert([{ blog_id: blogId, user_id: user.id, content }]);
+    const { error } = await instanceSupabase.from('comments').insert([{ blog_id: blogId, user_id: user.id, content }]);
     if (error) {
         console.error(error);
         return;
@@ -227,7 +221,7 @@ function showBlogEditor() {
 async function saveBlog(quill) {
     const title = document.getElementById('blog-title').value;
     const content = quill.root.innerHTML;
-    const { error } = await supaBaseInstance().from('blogs').insert([{ title, content }]);
+    const { error } = await instanceSupabase.from('blogs').insert([{ title, content }]);
     if (error) {
         console.error(error);
         return;
@@ -238,7 +232,7 @@ async function saveBlog(quill) {
 
 // Delete Blog
 async function deleteBlog(id) {
-    const { error } = await supaBaseInstance().from('blogs').delete().eq('id', id);
+    const { error } = await instanceSupabase.from('blogs').delete().eq('id', id);
     if (error) {
         console.error(error);
         return;

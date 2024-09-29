@@ -1,28 +1,5 @@
-body {
-    background-color: #ffe6f2; /* Light pink background */
-    color: #000;
-}
-
-.navbar {
-    background-color: #000; /* Black navbar */
-}
-
-.navbar-brand {
-    color: #ff66cc !important; /* Pink text */
-}
-
-.btn-outline-light {
-    border-color: #ff66cc;
-    color: #ff66cc;
-}
-
-.btn-outline-light:hover {
-    background-color: #ff66cc;
-    color: #fff;
-}
-
-#main-content h1 {
-    color: #ff66cc;
+.d-none {
+    display: none!important;
 }
 
 .game-board {
